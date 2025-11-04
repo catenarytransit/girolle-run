@@ -30,6 +30,11 @@ jobs:
         with:
           toolchain: stable
 
+      - name: Compiler cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "catenary-backend"
+
       - name: Compile girolle
         run: cargo build --release --bin girolle
         working-directory: ./catenary-backend
