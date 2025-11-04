@@ -26,9 +26,7 @@ jobs:
           path: transitland-atlas
 
       - name: Set up Rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
+        run: rustup toolchain install stable
 
       - name: Compiler cache
         uses: Swatinem/rust-cache@v2
