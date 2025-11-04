@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Install dependencies
         run: sudo apt-get update && sudo apt install -y libprotoc-dev protobuf-compiler build-essential gcc pkg-config libssl-dev unzip wget cmake openssl libpq-dev
-        
+      - uses: actions/checkout@v5
       - name: Checkout catenary-backend
         uses: actions/checkout@v4
         with:
