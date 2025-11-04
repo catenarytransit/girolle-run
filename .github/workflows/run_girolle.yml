@@ -1,0 +1,43 @@
+name: Run Girolle
+
+on:
+  workflow_call:
+
+jobs:
+  run-girolle:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required to upload release assets
+
+    steps:
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y libssl-dev pkg-config
+
+      - name: Checkout catenary-backend
+        uses: actions/checkout@v4
+        with:
+          repository: catenarytransit/catenary-backend
+          path: catenary-backend
+
+      - name: Checkout transitland-atlas
+        uses: actions/checkout@v4
+        with:
+          repository: catenarytransit/transitland-atlas
+          path: transitland-atlas
+
+      - name: Set up Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Compile girolle
+        run: cargo build --release --bin girolle
+        working-directory: ./catenary-backend
+
+      - name: Run girolle
+        run: ./catenary-backend/target/release/girolle --transitland ./transitland-atlas --outfile girolle-results.txt
+
+      - name: Upload girolle results to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload latest girolle-results.txt --clobber
