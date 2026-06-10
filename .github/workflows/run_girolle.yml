@@ -45,28 +45,27 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload latest girolle-results.txt --clobber
 
-      - name: Keep-alive workflow
+      # Step 1: Conditionally modify hello.txt
+      - name: Check inactivity and update hello.txt
         run: |
-          # Get timestamps
           LAST_COMMIT_TIME=$(git log -1 --format=%ct)
           CURRENT_TIME=$(date +%s)
           DIFF=$((CURRENT_TIME - LAST_COMMIT_TIME))
           THIRTY_DAYS=2592000
 
-          # Check if last commit is older than 30 days
           if [ $DIFF -gt $THIRTY_DAYS ]; then
-            echo "Last commit was more than 30 days ago. Updating hello.txt to prevent workflow deactivation."
-            
+            echo "Last commit was over 30 days ago. Updating hello.txt."
             date > hello.txt
-            
-            git config user.name "catenary-automated-workflow"
-            git config user.email "catenary-automated-github-workflow@catenarymaps.org"
-            
-            git add hello.txt
-            git commit --author="catenary-automated-workflow <catenary-automated-github-workflow@catenarymaps.org>" -m "chore: automated keep-alive update"
-            
-            # Pushing back explicitly to the active branch ref
-            git push origin HEAD:${{ github.ref_name }}
           else
-            echo "Last commit was less than 30 days ago. Skipping keep-alive action."
+            echo "Last commit was recent. Skipping file update."
           fi
+
+      # Step 2: Commit and push using the community action
+      - name: Push keep-alive commit if changed
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: automated keep-alive update"
+          file_pattern: "hello.txt"
+          commit_user_name: "catenary-automated-workflow"
+          commit_user_email: "catenary-automated-github-workflow@catenarymaps.org"
+          commit_author: "catenary-automated-workflow <catenary-automated-github-workflow@catenarymap
