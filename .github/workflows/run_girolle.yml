@@ -68,4 +68,4 @@ jobs:
           file_pattern: "hello.txt"
           commit_user_name: "catenary-automated-workflow"
           commit_user_email: "catenary-automated-github-workflow@catenarymaps.org"
-          commit_author: "catenary-automated-workflow <catenary-automated-github-workflow@catenarymap
+          commit_author: "catenary-automated-workflow <catenary-automated-github-workflow@catenarymaps.org>"
