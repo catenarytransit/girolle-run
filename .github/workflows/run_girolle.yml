@@ -44,3 +44,29 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload latest girolle-results.txt --clobber
+
+      - name: Keep-alive workflow
+        run: |
+          # Get timestamps
+          LAST_COMMIT_TIME=$(git log -1 --format=%ct)
+          CURRENT_TIME=$(date +%s)
+          DIFF=$((CURRENT_TIME - LAST_COMMIT_TIME))
+          THIRTY_DAYS=2592000
+
+          # Check if last commit is older than 30 days
+          if [ $DIFF -gt $THIRTY_DAYS ]; then
+            echo "Last commit was more than 30 days ago. Updating hello.txt to prevent workflow deactivation."
+            
+            date > hello.txt
+            
+            git config user.name "catenary-automated-workflow"
+            git config user.email "catenary-automated-github-workflow@catenarymaps.org"
+            
+            git add hello.txt
+            git commit --author="catenary-automated-workflow <catenary-automated-github-workflow@catenarymaps.org>" -m "chore: automated keep-alive update"
+            
+            # Pushing back explicitly to the active branch ref
+            git push origin HEAD:${{ github.ref_name }}
+          else
+            echo "Last commit was less than 30 days ago. Skipping keep-alive action."
+          fi
